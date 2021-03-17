@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
-// import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import session from 'express-session';
 import path from 'path';
 import { localMiddleware } from './middlewares';

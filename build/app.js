@@ -17,6 +17,8 @@ var _bodyParser = _interopRequireDefault(require("body-parser"));
 
 var _passport = _interopRequireDefault(require("passport"));
 
+var _mongoose = _interopRequireDefault(require("mongoose"));
+
 var _expressSession = _interopRequireDefault(require("express-session"));
 
 var _path = _interopRequireDefault(require("path"));
@@ -37,8 +39,6 @@ require("./passport");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-// import "core-js";
-// import mongoose from 'mongoose';
 var app = (0, _express["default"])();
 
 var MongoStore = require('connect-mongo')["default"];
