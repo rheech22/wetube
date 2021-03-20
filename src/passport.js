@@ -13,8 +13,8 @@ passport.use(User.createStrategy());
 passport.use(
     new GithubStrategy(
         {
-            clientID: process.env.GH_ID,
-            clientSecret: process.env.GH_SECRET,
+            clientID: process.env.GH_CLIENT_ID,
+            clientSecret: process.env.GH_CLIENT_SECRET,
             callbackURL: 'http://localhost:3000/auth/github/callback',
             scope: 'user.email',
         },
@@ -25,8 +25,8 @@ passport.use(
 passport.use(
     new FacebookStrategy(
         {
-            clientID: process.env.FB_ID,
-            clientSecret: process.env.FB_SECRET,
+            clientID: process.env.FB_CLIENT_ID,
+            clientSecret: process.env.FB_CLIENT_ECRET,
             callbackURL: `https://c51104133224.ngrok.io/auth/facebook/callback`,
             //ngrok끄면 안됨...
             profileFields: ['id', 'displayName', 'photos', 'email'],

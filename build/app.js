@@ -23,6 +23,8 @@ var _expressSession = _interopRequireDefault(require("express-session"));
 
 var _path = _interopRequireDefault(require("path"));
 
+var _connectMongo = _interopRequireDefault(require("connect-mongo"));
+
 var _middlewares = require("./middlewares");
 
 var _routes = _interopRequireDefault(require("./routes"));
@@ -39,10 +41,9 @@ require("./passport");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var app = (0, _express["default"])();
+var app = (0, _express["default"])(); // const MongoStore = require('connect-mongo').default;
 
-var MongoStore = require('connect-mongo')["default"];
-
+var CokieStore = (0, _connectMongo["default"])(_expressSession["default"]);
 app.use((0, _helmet["default"])()); //보안 담당 미들웨어
 
 app.set('view engine', 'pug');
@@ -65,8 +66,9 @@ app.use((0, _expressSession["default"])({
   secret: process.env.COOKIE_SECRET,
   resave: true,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL
+  // store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+  store: new CokieStore({
+    mongooseConnection: _mongoose["default"].connection
   })
 }));
 app.use(_passport["default"].initialize());
