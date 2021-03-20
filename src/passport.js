@@ -1,8 +1,8 @@
 import passport from 'passport';
-// import FacebookStrategy from 'passport-facebook';
+import FacebookStrategy from 'passport-facebook';
 import {
     githubLoginCallback,
-    // facebookLoginCallback,
+    facebookLoginCallback,
 } from './controllers/userController';
 import User from './models/User';
 
@@ -27,19 +27,19 @@ passport.use(
     ),
 );
 
-// passport.use(
-//     new FacebookStrategy(
-//         {
-//             clientID: process.env.FB_CLIENT_ID,
-//             clientSecret: process.env.FB_CLIENT_SECRET,
-//             callbackURL: `https://c51104133224.ngrok.io/auth/facebook/callback`,
-//             //ngrok끄면 안됨...
-//             profileFields: ['id', 'displayName', 'photos', 'email'],
-//             scope: ['public_profile', 'email'],
-//         },
-//         facebookLoginCallback,
-//     ),
-// );
+passport.use(
+    new FacebookStrategy(
+        {
+            clientID: process.env.FB_CLIENT_ID,
+            clientSecret: process.env.FB_CLIENT_SECRET,
+            callbackURL: `https://c51104133224.ngrok.io/auth/facebook/callback`,
+            //ngrok끄면 안됨...
+            profileFields: ['id', 'displayName', 'photos', 'email'],
+            scope: ['public_profile', 'email'],
+        },
+        facebookLoginCallback,
+    ),
+);
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
