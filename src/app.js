@@ -18,7 +18,7 @@ import apiRouter from './routers/apiRouter';
 
 import './passport';
 
-require('dotenv').config();
+dotenv.config();
 
 const app = express();
 
