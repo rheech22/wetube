@@ -172,6 +172,7 @@ var githubLoginCallback = /*#__PURE__*/function () {
 exports.githubLoginCallback = githubLoginCallback;
 
 var postGithubLogIn = function postGithubLogIn(req, res) {
+  req.flash('success', 'Welcome');
   res.redirect(_routes["default"].home);
 };
 
