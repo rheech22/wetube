@@ -7,8 +7,6 @@ exports["default"] = void 0;
 
 var _express = _interopRequireDefault(require("express"));
 
-var _dotenv = _interopRequireDefault(require("dotenv"));
-
 var _morgan = _interopRequireDefault(require("morgan"));
 
 var _helmet = _interopRequireDefault(require("helmet"));
@@ -42,8 +40,6 @@ var _apiRouter = _interopRequireDefault(require("./routers/apiRouter"));
 require("./passport");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-_dotenv["default"].config();
 
 var app = (0, _express["default"])(); // const MongoStore = require('connect-mongo').default;
 

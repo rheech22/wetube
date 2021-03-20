@@ -1,5 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';
+
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -17,8 +17,6 @@ import globalRouter from './routers/globalRouter';
 import apiRouter from './routers/apiRouter';
 
 import './passport';
-
-dotenv.config();
 
 const app = express();
 
