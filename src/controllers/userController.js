@@ -69,6 +69,7 @@ export const githubLoginCallback = async (_, __, profile, cb) => {
 };
 
 export const postGithubLogIn = (req, res) => {
+    req.flash('success', 'Welcome');
     res.redirect(routes.home);
 };
 
