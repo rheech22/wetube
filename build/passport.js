@@ -10,20 +10,24 @@ var _User = _interopRequireDefault(require("./models/User"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+// console.log(process.env.GH_CLIENT_ID);
+// console.log(process.env.GH_CLIENT_SECRET);
+// console.log(process.env.FB_CLIENT_ID);
+// console.log(process.env.FB_CLIENT_SECRET);
 var GithubStrategy = require('passport-github').Strategy;
 
 _passport["default"].use(_User["default"].createStrategy());
 
 _passport["default"].use(new GithubStrategy({
-  clientID: process.env.GH_ID,
-  clientSecret: process.env.GH_SECRET,
+  clientID: process.env.GH_CLIENT_ID,
+  clientSecret: process.env.GH_CLIENT_SECRET,
   callbackURL: 'http://localhost:3000/auth/github/callback',
   scope: 'user.email'
 }, _userController.githubLoginCallback));
 
 _passport["default"].use(new _passportFacebook["default"]({
-  clientID: process.env.FB_ID,
-  clientSecret: process.env.FB_SECRET,
+  clientID: process.env.FB_CLIENT_ID,
+  clientSecret: process.env.FB_CLIENT_SECRET,
   callbackURL: "https://c51104133224.ngrok.io/auth/facebook/callback",
   //ngrok끄면 안됨...
   profileFields: ['id', 'displayName', 'photos', 'email'],
