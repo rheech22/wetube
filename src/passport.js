@@ -20,7 +20,7 @@ passport.use(
         {
             clientID: process.env.GH_CLIENT_ID,
             clientSecret: process.env.GH_CLIENT_SECRET,
-            callbackURL: 'http://localhost:3000/auth/github/callback',
+            callbackURL: 'https://wetube22.herokuapp.com/auth/github/callback',
             scope: 'user.email',
         },
         githubLoginCallback,
