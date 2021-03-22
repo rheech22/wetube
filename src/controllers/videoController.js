@@ -107,7 +107,6 @@ export const deleteVideo = async (req, res) => {
         console.log(error);
     }
     res.redirect(routes.home);
-    // delete이 안되는 문제 수정해보자
 };
 
 // Register Video View
@@ -141,6 +140,7 @@ export const postAddComment = async (req, res) => {
         const newComment = await Comment.create({
             text: comment,
             creator: user.id,
+            // creator: req.user.id,
         });
         video.comments.push(newComment.id);
         video.save();

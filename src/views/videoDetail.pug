@@ -34,4 +34,8 @@ block content
                 ul.video__comments-list#jsCommentList
                  each comment in video.comments.reverse()
                     li
-                         span=comment.text
+                        if loggedUser
+                            if comment.creator.id === loggedUser.id
+                                a(href=routes.editVideo(video.id))
+                                    button Edit comment
+                        span=comment.text

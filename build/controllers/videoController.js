@@ -333,7 +333,7 @@ var deleteVideo = /*#__PURE__*/function () {
             console.log(_context7.t0);
 
           case 16:
-            res.redirect(_routes["default"].home); // delete이 안되는 문제 수정해보자
+            res.redirect(_routes["default"].home);
 
           case 17:
           case "end":
@@ -414,7 +414,8 @@ var postAddComment = /*#__PURE__*/function () {
             _context9.next = 7;
             return _Comment["default"].create({
               text: comment,
-              creator: user.id
+              creator: user.id // creator: req.user.id,
+
             });
 
           case 7:
