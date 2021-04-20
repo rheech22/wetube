@@ -1,6 +1,7 @@
 extends layouts/main.pug
 
 block content
+    h1.form-header Create Your ID
     .form-container 
         form(action=routes.join, method="post")
             input(type="text", name="name", placeholder="Full Name", required=true)

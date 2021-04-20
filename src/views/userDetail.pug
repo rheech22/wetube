@@ -4,20 +4,49 @@ include mixins/videoBlock
 block content
     .user-profile
         .user-profile__header
-             img.u-avatar(src=user.avatarUrl)
-             h4.profile__username=user.name
+            img.u-avatar(src=user.avatarUrl)
+            h4.profile__username=user.name
+            if user.subscribers.length !== 0
+                if user.subscribers.length === 1
+                    h6.profile__subscribers 1 subscriber
+                else
+                    h6.profile__subscribers=`${user.subscribers.length} subscribers`
+            if loggedUser
+                if user.id !== loggedUser.id
+                    if user.subscribers.includes(loggedUser.id)
+                        button#jsSubscriptionBtn(style="color: #485460") SUBSCRIBED
+                    else
+                        button#jsSubscriptionBtn(style="color: white") SUBSCRIBE
+            else
+                button#jsCantSubscriptionBtn SUBSCRIBE
         if loggedUser
              if user.id === loggedUser.id
                 .user-profile__btns
                      a(href=`/users${routes.editProfile}`)
-                        button ✏️ Edit Profile
+                        button Edit Profile
                      a(href=`/users${routes.changePassword}`)
-                        button 🔒 Change Password
-        .home-videos
-            each item in user.videos 
-                +videoBlock({
-                        id:item.id,
-                        title:item.title,
-                        views:item.views,
-                        videoFile:item.fileUrl
-                    })
+                        button Change Password
+    .user-videos
+        .user-videos__upload
+            h2.user-videos__title=`Uploaded By ${user.name}`
+            .home-videos
+                each item in user.videos 
+                    +videoBlock({
+                            id:item.id,
+                            title:item.title,
+                            views:item.views,
+                            videoFile:item.fileUrl,
+                            createdAt:item.createdAt
+                        })
+        .user-videos__bookmark
+            h2.user-videos__title=`${user.name}'s Bookmark`
+            .home-videos
+                each item in user.bookmarkVideos
+                    +videoBlock({
+                            id:item.id,
+                            title:item.title,
+                            views:item.views,
+                            videoFile:item.fileUrl,
+                            createdAt:item.createdAt
+                        })
+        

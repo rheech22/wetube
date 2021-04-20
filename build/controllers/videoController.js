@@ -3,13 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.postAddComment = exports.postRegisterView = exports.deleteVideo = exports.postEditVideo = exports.getEditVideo = exports.videoDetail = exports.postUpload = exports.getUpload = exports.search = exports.home = void 0;
+exports.addBookmark = exports.dislikeVideo = exports.likeVideo = exports.deleteComment = exports.postAddComment = exports.postRegisterView = exports.deleteVideo = exports.postEditVideo = exports.getEditVideo = exports.videoDetail = exports.postUpload = exports.getUpload = exports.search = exports.home = void 0;
 
 var _routes = _interopRequireDefault(require("../routes"));
 
 var _Videos = _interopRequireDefault(require("../models/Videos"));
 
 var _Comment = _interopRequireDefault(require("../models/Comment"));
+
+var _User = _interopRequireDefault(require("../models/User"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -70,7 +72,8 @@ var search = /*#__PURE__*/function () {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            searchingBy = req.query.term;
+            searchingBy = req.query.term; // 위 코드는 const searchyingBy = req.query.term 과 같음
+
             videos = [];
             _context2.prev = 2;
             _context2.next = 5;
@@ -123,18 +126,19 @@ exports.getUpload = getUpload;
 
 var postUpload = /*#__PURE__*/function () {
   var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
-    var _req$body, title, description, location, newVideo;
+    var _req$body, title, description, location, _req$createdAt, createdAt, newVideo;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            _req$body = req.body, title = _req$body.title, description = _req$body.description, location = req.file.location;
+            _req$body = req.body, title = _req$body.title, description = _req$body.description, location = req.file.location, _req$createdAt = req.createdAt, createdAt = _req$createdAt === void 0 ? Date.now() : _req$createdAt;
             _context3.next = 3;
             return _Videos["default"].create({
               fileUrl: location,
               title: title,
               description: description,
+              createdAt: createdAt,
               creator: req.user.id
             });
 
@@ -161,7 +165,7 @@ exports.postUpload = postUpload;
 
 var videoDetail = /*#__PURE__*/function () {
   var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
-    var id, video;
+    var id, video, videos, otherVideos, shuffle, videoDate, getFormattedDate, uploadDate;
     return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
@@ -173,24 +177,81 @@ var videoDetail = /*#__PURE__*/function () {
 
           case 4:
             video = _context4.sent;
+            _context4.next = 7;
+            return _Videos["default"].find({}).sort({
+              _id: -1
+            });
+
+          case 7:
+            videos = _context4.sent;
+            otherVideos = videos.filter(function (element) {
+              return element.id.toString() !== id.toString();
+            });
+
+            shuffle = function shuffle(array) {
+              for (var i = array.length - 1; i > 0; i -= 1) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var _ref5 = [array[j], array[i]];
+                array[i] = _ref5[0];
+                array[j] = _ref5[1];
+              }
+            };
+
+            shuffle(otherVideos); //date
+
+            videoDate = video.createdAt;
+
+            getFormattedDate = function getFormattedDate(date) {
+              var year = date.getFullYear();
+              var month = (1 + date.getMonth()).toString().padStart(2, '0');
+              var day = date.getDate().toString().padStart(2, '0');
+              return "".concat(year, ".").concat(month, ".").concat(day);
+            };
+
+            uploadDate = getFormattedDate(videoDate); // //how long
+            // const timeNow = Date.now();
+            // const timeUpload = videoDate.getTime();
+            // const timeDiff = timeNow - timeUpload;
+            // const dayDiff = timeDiff / 1000 / 60 / 60 / 24;
+            // let finalDiff;
+            // // console.log(Math.floor(dayDiff));
+            // if (dayDiff >= 730) {
+            //     finalDiff = `${Math.floor(dayDiff / 365)} years ago`;
+            // } else if (dayDiff >= 365) {
+            //     finalDiff = `a year ago`;
+            // } else if (dayDiff >= 60) {
+            //     finalDiff = `${Math.floor(dayDiff / 30)} months ago`;
+            // } else if (dayDiff >= 30) {
+            //     finalDiff = `a month ago`;
+            // } else if (dayDiff < 1) {
+            //     finalDiff = `${Math.floor(dayDiff * 24)} hours ago`;
+            // } else if (dayDiff < 2) {
+            //     finalDiff = `a day ago`;
+            // } else {
+            //     finalDiff = `${Math.floor(dayDiff)} days ago`;
+            // }
+            // console.log(finalDiff);
+
             res.render('videoDetail', {
               pageTitle: video.title,
-              video: video
+              video: video,
+              otherVideos: otherVideos,
+              uploadDate: uploadDate
             });
-            _context4.next = 11;
+            _context4.next = 20;
             break;
 
-          case 8:
-            _context4.prev = 8;
+          case 17:
+            _context4.prev = 17;
             _context4.t0 = _context4["catch"](1);
             res.redirect(_routes["default"].home);
 
-          case 11:
+          case 20:
           case "end":
             return _context4.stop();
         }
       }
-    }, _callee4, null, [[1, 8]]);
+    }, _callee4, null, [[1, 17]]);
   }));
 
   return function videoDetail(_x7, _x8) {
@@ -201,7 +262,7 @@ var videoDetail = /*#__PURE__*/function () {
 exports.videoDetail = videoDetail;
 
 var getEditVideo = /*#__PURE__*/function () {
-  var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res) {
+  var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res) {
     var id, video;
     return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
@@ -246,14 +307,14 @@ var getEditVideo = /*#__PURE__*/function () {
   }));
 
   return function getEditVideo(_x9, _x10) {
-    return _ref5.apply(this, arguments);
+    return _ref6.apply(this, arguments);
   };
 }();
 
 exports.getEditVideo = getEditVideo;
 
 var postEditVideo = /*#__PURE__*/function () {
-  var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(req, res) {
+  var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(req, res) {
     var id, _req$body2, title, description;
 
     return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -289,15 +350,15 @@ var postEditVideo = /*#__PURE__*/function () {
   }));
 
   return function postEditVideo(_x11, _x12) {
-    return _ref6.apply(this, arguments);
+    return _ref7.apply(this, arguments);
   };
 }();
 
 exports.postEditVideo = postEditVideo;
 
 var deleteVideo = /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(req, res) {
-    var id, video;
+  var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(req, res) {
+    var id, video, user, filteredVideos;
     return regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
         switch (_context7.prev = _context7.next) {
@@ -309,42 +370,59 @@ var deleteVideo = /*#__PURE__*/function () {
 
           case 4:
             video = _context7.sent;
+            _context7.next = 7;
+            return _User["default"].findById(req.user.id);
+
+          case 7:
+            user = _context7.sent;
 
             if (!(video.creator.toString() !== req.user.id)) {
-              _context7.next = 9;
+              _context7.next = 12;
               break;
             }
 
             throw Error();
 
-          case 9:
-            _context7.next = 11;
+          case 12:
+            _context7.next = 14;
             return _Videos["default"].findOneAndRemove({
               _id: id
             });
 
-          case 11:
-            _context7.next = 16;
+          case 14:
+            filteredVideos = user.videos.filter(function (element) {
+              return element.toString() !== id.toString();
+            });
+            user.videos = filteredVideos;
+            user.save();
+
+          case 17:
+            _context7.next = 22;
             break;
 
-          case 13:
-            _context7.prev = 13;
+          case 19:
+            _context7.prev = 19;
             _context7.t0 = _context7["catch"](1);
             console.log(_context7.t0);
 
-          case 16:
+          case 22:
+            _context7.prev = 22;
+            res.end();
+            return _context7.finish(22);
+
+          case 25:
             res.redirect(_routes["default"].home);
 
-          case 17:
+          case 26:
           case "end":
             return _context7.stop();
         }
       }
-    }, _callee7, null, [[1, 13]]);
+    }, _callee7, null, [[1, 19, 22, 25]]);
   }));
 
   return function deleteVideo(_x13, _x14) {
-    return _ref7.apply(this, arguments);
+    return _ref8.apply(this, arguments);
   };
 }(); // Register Video View
 
@@ -352,7 +430,7 @@ var deleteVideo = /*#__PURE__*/function () {
 exports.deleteVideo = deleteVideo;
 
 var postRegisterView = /*#__PURE__*/function () {
-  var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(req, res) {
+  var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(req, res) {
     var id, video;
     return regeneratorRuntime.wrap(function _callee8$(_context8) {
       while (1) {
@@ -390,15 +468,15 @@ var postRegisterView = /*#__PURE__*/function () {
   }));
 
   return function postRegisterView(_x15, _x16) {
-    return _ref8.apply(this, arguments);
+    return _ref9.apply(this, arguments);
   };
-}(); // Add Comment
+}(); //Handle Comment
 
 
 exports.postRegisterView = postRegisterView;
 
 var postAddComment = /*#__PURE__*/function () {
-  var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(req, res) {
+  var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(req, res) {
     var id, comment, user, video, newComment;
     return regeneratorRuntime.wrap(function _callee9$(_context9) {
       while (1) {
@@ -414,38 +492,300 @@ var postAddComment = /*#__PURE__*/function () {
             _context9.next = 7;
             return _Comment["default"].create({
               text: comment,
-              creator: user.id // creator: req.user.id,
+              creator: user.id,
+              videos: id // creator: req.user.id,
 
             });
 
           case 7:
             newComment = _context9.sent;
+            console.log(user.id);
+            console.log(id);
+            console.log(newComment.id);
             video.comments.push(newComment.id);
             video.save();
-            _context9.next = 15;
+            _context9.next = 18;
             break;
-
-          case 12:
-            _context9.prev = 12;
-            _context9.t0 = _context9["catch"](1);
-            res.status(400);
 
           case 15:
             _context9.prev = 15;
-            res.end();
-            return _context9.finish(15);
+            _context9.t0 = _context9["catch"](1);
+            res.status(400);
 
           case 18:
+            _context9.prev = 18;
+            res.end();
+            return _context9.finish(18);
+
+          case 21:
           case "end":
             return _context9.stop();
         }
       }
-    }, _callee9, null, [[1, 12, 15, 18]]);
+    }, _callee9, null, [[1, 15, 18, 21]]);
   }));
 
   return function postAddComment(_x17, _x18) {
-    return _ref9.apply(this, arguments);
+    return _ref10.apply(this, arguments);
   };
 }();
 
 exports.postAddComment = postAddComment;
+
+var deleteComment = /*#__PURE__*/function () {
+  var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10(req, res) {
+    var id, index, video, commentList;
+    return regeneratorRuntime.wrap(function _callee10$(_context10) {
+      while (1) {
+        switch (_context10.prev = _context10.next) {
+          case 0:
+            id = req.params.id, index = req.body.index;
+            _context10.prev = 1;
+            _context10.next = 4;
+            return _Videos["default"].findById(id);
+
+          case 4:
+            video = _context10.sent;
+            commentList = video.comments.reverse();
+            console.log("".concat(index, "-fourth"));
+            console.log(commentList); // const deleteCommentId = video.comments.reverse()[index];
+
+            commentList.splice(index, 1);
+            console.log(commentList);
+            video.comments.reverse();
+            video.save(); // await Comment.findOneAndRemove({ _id: deleteCommentId });
+
+            _context10.next = 18;
+            break;
+
+          case 14:
+            _context10.prev = 14;
+            _context10.t0 = _context10["catch"](1);
+            console.log('error');
+            res.status(400);
+
+          case 18:
+            _context10.prev = 18;
+            res.end();
+            return _context10.finish(18);
+
+          case 21:
+          case "end":
+            return _context10.stop();
+        }
+      }
+    }, _callee10, null, [[1, 14, 18, 21]]);
+  }));
+
+  return function deleteComment(_x19, _x20) {
+    return _ref11.apply(this, arguments);
+  };
+}(); //like and dislike
+//해당 array에 null 값이 들어가서 bad request 400 이 나오는 오류 수정
+//db에서 직접 null값을 제거해주니 정상작동.. 어떻게 null 값이 들어갔는지는 모르겠음
+
+
+exports.deleteComment = deleteComment;
+
+var likeVideo = /*#__PURE__*/function () {
+  var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(req, res) {
+    var id, user, video, filteredLikes, filteredDislikes;
+    return regeneratorRuntime.wrap(function _callee11$(_context11) {
+      while (1) {
+        switch (_context11.prev = _context11.next) {
+          case 0:
+            id = req.params.id, user = req.user;
+            _context11.prev = 1;
+            _context11.next = 4;
+            return _Videos["default"].findById(id);
+
+          case 4:
+            video = _context11.sent;
+
+            if (video.likes.includes(user.id)) {
+              filteredLikes = video.likes.filter(function (element) {
+                return element.toString() !== user.id.toString();
+              });
+              video.likes = filteredLikes; // console.log('this guy has been already here!');
+
+              res.status(206);
+            } else if (video.dislikes.includes(user.id)) {
+              filteredDislikes = video.dislikes.filter(function (element) {
+                return element.toString() !== user.id.toString();
+              });
+              video.dislikes = filteredDislikes;
+              video.likes.push(user.id); // console.log('this guy had disliked this video!');
+
+              res.status(207);
+            } else {
+              video.likes.push(user.id); // console.log('this guy is Newbie!');
+
+              res.status(200);
+            }
+
+            video.save();
+            _context11.next = 12;
+            break;
+
+          case 9:
+            _context11.prev = 9;
+            _context11.t0 = _context11["catch"](1);
+            res.status(400);
+
+          case 12:
+            _context11.prev = 12;
+            res.end();
+            return _context11.finish(12);
+
+          case 15:
+          case "end":
+            return _context11.stop();
+        }
+      }
+    }, _callee11, null, [[1, 9, 12, 15]]);
+  }));
+
+  return function likeVideo(_x21, _x22) {
+    return _ref12.apply(this, arguments);
+  };
+}();
+
+exports.likeVideo = likeVideo;
+
+var dislikeVideo = /*#__PURE__*/function () {
+  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(req, res) {
+    var id, user, video, filteredDislikes, filteredLikes;
+    return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      while (1) {
+        switch (_context12.prev = _context12.next) {
+          case 0:
+            id = req.params.id, user = req.user;
+            _context12.prev = 1;
+            _context12.next = 4;
+            return _Videos["default"].findById(id);
+
+          case 4:
+            video = _context12.sent;
+
+            if (video.dislikes.includes(user.id)) {
+              filteredDislikes = video.dislikes.filter(function (element) {
+                return element.toString() !== user.id.toString();
+              });
+              video.dislikes = filteredDislikes; // console.log('this guy has been already here!');
+
+              res.status(206);
+            } else if (video.likes.includes(user.id)) {
+              filteredLikes = video.likes.filter(function (element) {
+                return element.toString() !== user.id.toString();
+              });
+              video.likes = filteredLikes;
+              video.dislikes.push(user.id); // console.log('this guy had liked this video!');
+
+              res.status(207);
+            } else {
+              video.dislikes.push(user.id); // console.log('this guy is Newbie!');
+
+              res.status(200);
+            }
+
+            video.save();
+            _context12.next = 12;
+            break;
+
+          case 9:
+            _context12.prev = 9;
+            _context12.t0 = _context12["catch"](1);
+            res.status(400);
+
+          case 12:
+            _context12.prev = 12;
+            res.end();
+            return _context12.finish(12);
+
+          case 15:
+          case "end":
+            return _context12.stop();
+        }
+      }
+    }, _callee12, null, [[1, 9, 12, 15]]);
+  }));
+
+  return function dislikeVideo(_x23, _x24) {
+    return _ref13.apply(this, arguments);
+  };
+}(); //Bookmark
+
+
+exports.dislikeVideo = dislikeVideo;
+
+var addBookmark = /*#__PURE__*/function () {
+  var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(req, res) {
+    var id, user, video, bookmarkUser, filteredBookmarkUsers, filteredBookmarkVideos;
+    return regeneratorRuntime.wrap(function _callee13$(_context13) {
+      while (1) {
+        switch (_context13.prev = _context13.next) {
+          case 0:
+            id = req.params.id, user = req.user;
+            _context13.prev = 1;
+            _context13.next = 4;
+            return _Videos["default"].findById(id);
+
+          case 4:
+            video = _context13.sent;
+            _context13.next = 7;
+            return _User["default"].findById(user.id);
+
+          case 7:
+            bookmarkUser = _context13.sent;
+            console.log(video.bookmarkUsers);
+            console.log(bookmarkUser.bookmarkVideos);
+
+            if (video.bookmarkUsers.includes(user.id)) {
+              filteredBookmarkUsers = video.bookmarkUsers.filter(function (element) {
+                return element.toString() !== user.id.toString();
+              });
+              video.bookmarkUsers = filteredBookmarkUsers;
+              filteredBookmarkVideos = bookmarkUser.bookmarkVideos.filter(function (element) {
+                return element.toString() !== id.toString();
+              });
+              bookmarkUser.bookmarkVideos = filteredBookmarkVideos; // console.log('this guy has been already here!');
+
+              res.status(206);
+            } else {
+              video.bookmarkUsers.push(user.id);
+              bookmarkUser.bookmarkVideos.push(id); // console.log('this guy is Newbie!');
+
+              res.status(200);
+            }
+
+            video.save();
+            bookmarkUser.save();
+            console.log(video.bookmarkUsers);
+            console.log(bookmarkUser.bookmarkVideos);
+            _context13.next = 20;
+            break;
+
+          case 17:
+            _context13.prev = 17;
+            _context13.t0 = _context13["catch"](1);
+            res.status(400);
+
+          case 20:
+            _context13.prev = 20;
+            res.end();
+            return _context13.finish(20);
+
+          case 23:
+          case "end":
+            return _context13.stop();
+        }
+      }
+    }, _callee13, null, [[1, 17, 20, 23]]);
+  }));
+
+  return function addBookmark(_x25, _x26) {
+    return _ref14.apply(this, arguments);
+  };
+}();
+
+exports.addBookmark = addBookmark;

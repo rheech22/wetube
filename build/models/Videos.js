@@ -23,6 +23,7 @@ var VideoSchema = new _mongoose["default"].Schema({
     type: Number,
     "default": 0
   },
+  finalDiff: String,
   createdAt: {
     type: Date,
     dafault: Date.now
@@ -34,7 +35,19 @@ var VideoSchema = new _mongoose["default"].Schema({
   creator: {
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  likes: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  dislikes: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  bookmarkUsers: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
 var model = _mongoose["default"].model('Video', VideoSchema);

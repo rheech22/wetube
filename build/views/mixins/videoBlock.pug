@@ -1,9 +1,13 @@
 mixin videoBlock(video = {})
     .videoBlock
         a(href=routes.videoDetail(video.id))
-            video.videoBlock__thumbnail(src=video.videoFile, controls=false)
+            .video__container
+                video.videoBlock__thumbnail(src=`${video.videoFile}#t=5.0`, controls=false, preload="metadata")
             h4.videoBlock__title=video.title
-            if video.views === 1
-                h6.videoBlock__views 1 view
-            else
-                h6.videoBlock__views #{video.views} views
+            div.videoBlock__info
+                if video.views === 1
+                    h6.videoBlock__views 조회수 1회 •
+                else
+                    h6.videoBlock__views 조회수 #{video.views}회 •
+                span.jsFromUpdate=video.createdAt.getTime()
+

@@ -27,11 +27,20 @@ var GITHUB = '/auth/github';
 var GITHUB_CALLBACK = '/auth/github/callback'; // Facebook
 
 var FB = '/auth/facebook';
-var FB_CALLBACK = '/auth/facebook/callback'; // API
+var FB_CALLBACK = '/auth/facebook/callback'; // Kakao
+
+var KT = '/auth/kakao';
+var KT_CALLBACK = '/auth/kakao/callback'; // API
 
 var API = '/api';
 var REGISTER_VIEW = '/:id/view';
 var ADD_COMMENT = '/:id/comment';
+var DELETE_COMMENT = '/:id/delete-comment';
+var LIKE = '/:id/like';
+var DISLIKE = '/:id/dislike';
+var BOOKMARK = '/:id/bookmark';
+var SUBSCRIPTION_FROM_PROFILE = '/:id/subscription-from-profile';
+var SUBSCRIPTION_FROM_VIDEO = '/:id/subscription-from-video';
 var routes = {
   home: HOME,
   join: JOIN,
@@ -74,11 +83,19 @@ var routes = {
   gitHub: GITHUB,
   githubCallback: GITHUB_CALLBACK,
   me: ME,
+  kakao: KT,
+  kakaoCallback: KT_CALLBACK,
   facebook: FB,
   facebookCallback: FB_CALLBACK,
   api: API,
   registerView: REGISTER_VIEW,
-  addComment: ADD_COMMENT
+  addComment: ADD_COMMENT,
+  deleteComment: DELETE_COMMENT,
+  like: LIKE,
+  dislike: DISLIKE,
+  bookmark: BOOKMARK,
+  subscriptionFromProfile: SUBSCRIPTION_FROM_PROFILE,
+  subscriptionFromVideo: SUBSCRIPTION_FROM_VIDEO
 };
 var _default = routes;
 exports["default"] = _default;

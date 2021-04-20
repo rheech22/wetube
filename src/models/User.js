@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
     avatarUrl: String,
     faceboodkId: Number,
     githubId: Number,
+    kakaoId: Number,
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -17,6 +18,24 @@ const UserSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Video',
+        },
+    ],
+    bookmarkVideos: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Video',
+        },
+    ],
+    subscriptions: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+    ],
+    subscribers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
         },
     ],
 });

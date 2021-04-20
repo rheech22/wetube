@@ -33,9 +33,15 @@ globalRouter.get(_routes["default"].githubCallback, _passport["default"].authent
   failureRedirect: '/login'
 }), _userController.postGithubLogIn);
 globalRouter.get(_routes["default"].me, _userController.getMe);
-globalRouter.get(_routes["default"].facebook, _userController.facebookLogin);
-globalRouter.get(_routes["default"].facebookCallback, _passport["default"].authenticate('facebook', {
+globalRouter.get(_routes["default"].kakao, _userController.kakaoLogin);
+globalRouter.get(_routes["default"].kakaoCallback, _passport["default"].authenticate('kakao', {
   failureRedirect: '/login'
-}), _userController.postFacebookLogin);
+}), _userController.postKakaoLogIn); // globalRouter.get(routes.facebook, facebookLogin);
+// globalRouter.get(
+//     routes.facebookCallback,
+//     passport.authenticate('facebook', { failureRedirect: '/login' }),
+//     postFacebookLogin,
+// );
+
 var _default = globalRouter;
 exports["default"] = _default;

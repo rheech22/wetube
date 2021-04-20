@@ -17,6 +17,7 @@ var UserSchema = new _mongoose["default"].Schema({
   avatarUrl: String,
   faceboodkId: Number,
   githubId: Number,
+  kakaoId: Number,
   comments: [{
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: 'Comment'
@@ -24,6 +25,18 @@ var UserSchema = new _mongoose["default"].Schema({
   videos: [{
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: 'Video'
+  }],
+  bookmarkVideos: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'Video'
+  }],
+  subscriptions: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  subscribers: [{
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'User'
   }]
 });
 UserSchema.plugin(_passportLocalMongoose["default"], {

@@ -1,6 +1,7 @@
 extends layouts/main.pug
 
 block content
+    h1.form-header EDIT PAGE
     .form-container
         form(action=routes.editVideo(video.id), method="post")
             input(type="text", placeholder="Title", name="title", value=video.title)

@@ -21,6 +21,10 @@ var CommentShema = new _mongoose["default"].Schema({
   creator: {
     type: _mongoose["default"].Schema.Types.ObjectId,
     ref: 'User'
+  },
+  videos: {
+    type: _mongoose["default"].Schema.Types.ObjectId,
+    ref: 'Video'
   }
 });
 

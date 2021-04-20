@@ -1,6 +1,7 @@
 import passport from 'passport';
 import routes from '../routes';
 import User from '../models/User';
+import Video from '../models/Videos';
 
 export const getJoin = (req, res) => {
     res.render('join', { pageTitle: 'Join' });
@@ -73,25 +74,32 @@ export const postGithubLogIn = (req, res) => {
     res.redirect(routes.home);
 };
 
-export const facebookLogin = passport.authenticate('facebook');
+export const kakaoLogin = passport.authenticate('kakao', {
+    successFlash: 'Welcome',
+    failureFlash: "Can't log in. Check email and/or password",
+});
 
-export const facebookLoginCallback = async (_, __, profile, cb) => {
+export const kakaoLoginCallback = async (_, __, profile, cb) => {
     const {
-        _json: { id, name, email },
+        _json: {
+            id,
+            properties: { nickname: name, profile_image: profileImage },
+            kakao_account: { email },
+        },
     } = profile;
+    console.log(profile);
     try {
         const user = await User.findOne({ email });
         if (user) {
-            user.facebookId = id;
-            user.avatarUrl = `https://graph.facebook.com/${id}/picture?type=large`;
+            user.kakaoId = id;
             user.save();
             return cb(null, user);
         }
         const newUser = await User.create({
             email,
             name,
-            facebookId: id,
-            avatarUrl: `https://graph.facebook.com/${id}/picture?type=large`,
+            kakaoId: id,
+            avatarUrl: profileImage,
         });
         return cb(null, newUser);
     } catch (error) {
@@ -99,9 +107,40 @@ export const facebookLoginCallback = async (_, __, profile, cb) => {
     }
 };
 
-export const postFacebookLogin = (req, res) => {
+export const postKakaoLogIn = (req, res) => {
+    req.flash('success', 'Welcome');
     res.redirect(routes.home);
 };
+
+// export const facebookLogin = passport.authenticate('facebook');
+
+// export const facebookLoginCallback = async (_, __, profile, cb) => {
+//     const {
+//         _json: { id, name, email },
+//     } = profile;
+//     try {
+//         const user = await User.findOne({ email });
+//         if (user) {
+//             user.facebookId = id;
+//             user.avatarUrl = `https://graph.facebook.com/${id}/picture?type=large`;
+//             user.save();
+//             return cb(null, user);
+//         }
+//         const newUser = await User.create({
+//             email,
+//             name,
+//             facebookId: id,
+//             avatarUrl: `https://graph.facebook.com/${id}/picture?type=large`,
+//         });
+//         return cb(null, newUser);
+//     } catch (error) {
+//         return cb(error);
+//     }
+// };
+
+// export const postFacebookLogin = (req, res) => {
+//     res.redirect(routes.home);
+// };
 
 export const logout = (req, res) => {
     req.flash('info', 'Logged out, see you later');
@@ -110,8 +149,11 @@ export const logout = (req, res) => {
     // res.render("logout", { pageTitle: "Log Out" });
 };
 
-export const getMe = (req, res) => {
-    res.render('userDetail', { pageTitle: 'User Detail', user: req.user });
+export const getMe = async (req, res) => {
+    const user = await User.findById(req.user.id)
+        .populate('videos')
+        .populate('bookmarkVideos');
+    res.render('userDetail', { pageTitle: 'User Detail', user });
 };
 
 // export const users = (req, res) => res.render("users", { pageTitle: "Users" });
@@ -120,8 +162,10 @@ export const userDetail = async (req, res) => {
         params: { id },
     } = req;
     try {
-        const user = await User.findById(id).populate('videos');
-        console.log(user);
+        const user = await User.findById(id)
+            .populate('videos')
+            .populate('bookmarkVideos');
+
         res.render('userDetail', { pageTitle: 'User Detail', user });
     } catch (error) {
         req.flash('error', 'User not found');
@@ -171,5 +215,79 @@ export const postChangePassword = async (req, res) => {
         req.flash('error', "Can't change password");
         res.status(400);
         res.redirect(`/users/${routes.changePassword}`);
+    }
+};
+
+export const addSubscriptionFromProfile = async (req, res) => {
+    const {
+        params: { id },
+        user,
+    } = req;
+    try {
+        const subscription = await User.findById(id);
+        const subscriber = await User.findById(user.id);
+
+        if (subscriber.subscriptions.includes(id)) {
+            const filteredSubscriptions = subscriber.subscriptions.filter(
+                (element) => element.toString() !== id.toString(),
+            );
+            subscriber.subscriptions = filteredSubscriptions;
+
+            const filteredSubscribers = subscription.subscribers.filter(
+                (element) => element.toString() !== user.id.toString(),
+            );
+            subscription.subscribers = filteredSubscribers;
+            // console.log('this guy has been already here!');
+            res.status(206);
+        } else {
+            subscriber.subscriptions.push(id);
+            subscription.subscribers.push(user.id);
+            // console.log('this guy is Newbie!');
+            res.status(200);
+        }
+        subscriber.save();
+        subscription.save();
+    } catch (error) {
+        res.status(400);
+    } finally {
+        res.end();
+    }
+};
+
+export const addSubscriptionFromVideo = async (req, res) => {
+    const {
+        params: { id },
+        user,
+    } = req;
+    try {
+        const video = await (await Video.findById(id)).populate('creator');
+        const uploader = video.creator;
+        const subscription = await User.findById(uploader);
+        const subscriber = await User.findById(user.id);
+
+        if (subscriber.subscriptions.includes(subscription.id)) {
+            const filteredSubscriptions = subscriber.subscriptions.filter(
+                (element) => element.toString() !== subscription.id.toString(),
+            );
+            subscriber.subscriptions = filteredSubscriptions;
+
+            const filteredSubscribers = subscription.subscribers.filter(
+                (element) => element.toString() !== user.id.toString(),
+            );
+            subscription.subscribers = filteredSubscribers;
+            // console.log('this guy has been already here!');
+            res.status(206);
+        } else {
+            subscriber.subscriptions.push(subscription.id);
+            subscription.subscribers.push(user.id);
+            // console.log('this guy is Newbie!');
+            res.status(200);
+        }
+        subscriber.save();
+        subscription.save();
+    } catch (error) {
+        res.status(400);
+    } finally {
+        res.end();
     }
 };

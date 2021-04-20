@@ -3,26 +3,42 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    .social-login--header {
+        color: $black;
+        font-size: 3vh;
+        font-weight: 600;
+        margin-bottom: 45px;
+        opacity: 0.7;
+    }
     button {
         width: 100%;
         max-width: 320px;
+        height: 6vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 12px 0px;
+        font-size: 18px;
+        font-weight: 500;
+        border: none;
+
         &:not(:last-child) {
             margin-bottom: 15px;
         }
+        a:visited {
+            color: unset;
+        }
         span {
+            font-size: 24px;
             margin-right: 10px;
-            font-size: 20px;
         }
     }
     .social-login--github {
-        background-color: $black;
-        color: white;
+        background-color: #f5f6fa;
+        color: black;
     }
-    .social-login--facebook {
-        background-color: #3a5998;
-        color: white;
+    .social-login--kakao {
+        background-color: #fee500;
+        color: rgba($color: #000000, $alpha: 0.8);
     }
 }
