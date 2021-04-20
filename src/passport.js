@@ -34,7 +34,7 @@ passport.use(
         {
             clientID: process.env.KT_CLIENT_ID,
             clientSecret: '', // clientSecret을 사용하지 않는다면 넘기지 말거나 빈 스트링을 넘길 것
-            callbackURL: 'http://localhost:3000/auth/kakao/callback',
+            callbackURL: 'https://wetube22.herokuapp.com/auth/kakao/callback',
         },
         kakaoLoginCallback,
     ),
