@@ -4,6 +4,9 @@
     height: 0;
     overflow: hidden;
     background-color: black;
+    &:focus {
+        outline: none;
+    }
 
     // &:hover {
     //     .videoPlayer__controls {

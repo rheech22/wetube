@@ -36,11 +36,13 @@ var API = '/api';
 var REGISTER_VIEW = '/:id/view';
 var ADD_COMMENT = '/:id/comment';
 var DELETE_COMMENT = '/:id/delete-comment';
+var EDIT_COMMENT = '/:id/edit-comment';
 var LIKE = '/:id/like';
 var DISLIKE = '/:id/dislike';
 var BOOKMARK = '/:id/bookmark';
 var SUBSCRIPTION_FROM_PROFILE = '/:id/subscription-from-profile';
 var SUBSCRIPTION_FROM_VIDEO = '/:id/subscription-from-video';
+var GET_USER = '/:id/get-user';
 var routes = {
   home: HOME,
   join: JOIN,
@@ -91,11 +93,13 @@ var routes = {
   registerView: REGISTER_VIEW,
   addComment: ADD_COMMENT,
   deleteComment: DELETE_COMMENT,
+  editComment: EDIT_COMMENT,
   like: LIKE,
   dislike: DISLIKE,
   bookmark: BOOKMARK,
   subscriptionFromProfile: SUBSCRIPTION_FROM_PROFILE,
-  subscriptionFromVideo: SUBSCRIPTION_FROM_VIDEO
+  subscriptionFromVideo: SUBSCRIPTION_FROM_VIDEO,
+  getUser: GET_USER
 };
 var _default = routes;
 exports["default"] = _default;

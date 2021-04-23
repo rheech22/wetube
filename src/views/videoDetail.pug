@@ -56,8 +56,16 @@ block content
                 .video__detail
                     .video__author
                         a(href=routes.userDetail(video.creator.id))
-                            img.u-avatar(src=video.creator.avatarUrl)
+                            if video.creator.avatarUrl
+                                img.u-avatar(src=video.creator.avatarUrl)
+                            else
+                                img.u-avatar(src="https://mblogthumb-phinf.pstatic.net/20150403_86/e2voo_14280514283502gas9_JPEG/kakako-00.jpg?type=w800")
                             span=video.creator.name
+                            if video.creator.subscribers.length !== 0
+                                if video.creator.subscribers.length === 1
+                                    h6.profile__subscribers 1 subscriber
+                                else
+                                    h6.profile__subscribers=`${video.creator.subscribers.length} subscribers`
                         if loggedUser
                             if video.creator.id !== loggedUser.id
                                 if video.creator.subscribers.includes(loggedUser.id)
@@ -65,7 +73,7 @@ block content
                                 else
                                     button#jsSubscriptionBtn(style="color: white") SUBSCRIBE
                         else
-                            button#jsCantSubscriptionBtn SUBSCRIBE
+                            button#jsSubscriptionBtn(style="color: white") SUBSCRIBE
                     p.video__description=video.description
                 .video__comments
                     if video.comments.length === 1
@@ -81,10 +89,22 @@ block content
                     ul.video__comments-list#jsCommentList
                         each comment, index in video.comments.reverse()
                             li(data-index=index)
-                                span=comment.text
+                                div
+                                    if comment.creator.avatarUrl
+                                        img.video__comments-avatar(src=comment.creator.avatarUrl)
+                                    else
+                                        img.video__comments-avatar(src="https://mblogthumb-phinf.pstatic.net/20150403_86/e2voo_14280514283502gas9_JPEG/kakako-00.jpg?type=w800")
+                                div.jsCommentsInfo
+                                    .video__comments-info
+                                        span.video__comments-name=comment.creator.name
+                                        if comment.createdAt
+                                            span.video__comments-date=comment.createdAt.getTime()
+                                    span.video__comments-text=comment.text
                                 if loggedUser
-                                    if comment.creator == loggedUser.id
-                                        button.video__comments-delete.jsDelBtn Delete
+                                    if comment.creator.id == loggedUser.id
+                                        .video__comments-btns
+                                            button.video__comments-edit.jsEditBtn Edit
+                                            button.video__comments-delete.jsDelBtn Delete
         .video-detail__others
             each item in otherVideos
                 +videoBlock({

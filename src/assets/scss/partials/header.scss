@@ -45,12 +45,14 @@
                     width: 100%;
                     border-radius: 5px;
                     font-size: 14px;
-                    color: $black;
+                    background-color: $black;
+                    color: white;
                     font-weight: 500;
                     max-width: none;
                     &::placeholder {
+                        color: $blue;
                         font-weight: 300;
-                        color: rgba(0, 0, 0, 0.7);
+                        opacity: 0.7;
                     }
                 }
             }
@@ -112,6 +114,7 @@
                 }
                 &:hover {
                     background-color: $hover;
+                    color: $black;
                     border-radius: 4px;
                 }
             }

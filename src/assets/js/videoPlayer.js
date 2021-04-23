@@ -11,7 +11,7 @@ const totalTime = document.getElementById('totalTime');
 const volumeRange = document.getElementById('jsVolume');
 const progress = document.querySelector('.videoPlayer__progress');
 const progressBar = document.querySelector('.videoPlayer__progress--filled');
-const inputComment = document.getElementById('jsInputComment');
+// const inputComment = document.getElementById('jsInputComment');
 
 let isChanging = false;
 let previousVol = 50;
@@ -59,15 +59,13 @@ function handleSpaceKey(event) {
     }
 }
 
-function handleInputBlur() {
-    console.log('hi');
-    window.addEventListener('keydown', handleSpaceKey);
-}
+// function handleInputBlur() {
+//     window.addEventListener('keydown', handleSpaceKey);
+// }
 
-function handleInputFocus() {
-    console.log('hi');
-    window.removeEventListener('keydown', handleSpaceKey);
-}
+// function handleInputFocus() {
+//     window.removeEventListener('keydown', handleSpaceKey);
+// }
 
 function handleVolumeClick() {
     if (videoPlayer.volume === 0) {
@@ -207,7 +205,7 @@ function init() {
     playBtn.addEventListener('click', handlePlayClick);
     volumeBtn.addEventListener('click', handleVolumeClick);
     fullScrnBtn.addEventListener('click', goFullScreen);
-    window.addEventListener('keydown', handleSpaceKey);
+    videoContainer.addEventListener('keydown', handleSpaceKey);
 
     videoPlayer.addEventListener('loadedmetadata', setTotalTime);
     videoPlayer.addEventListener('timeupdate', setCurrentTime);
@@ -231,8 +229,8 @@ function init() {
     progress.addEventListener('mouseup', () => (mousedown = false));
 
     //this is for using a space key for comments
-    inputComment.addEventListener('focus', handleInputFocus);
-    inputComment.addEventListener('blur', handleInputBlur);
+    // inputComment.addEventListener('focus', handleInputFocus);
+    // inputComment.addEventListener('blur', handleInputBlur);
 }
 
 if (videoContainer) {

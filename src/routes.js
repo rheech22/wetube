@@ -43,11 +43,13 @@ const API = '/api';
 const REGISTER_VIEW = '/:id/view';
 const ADD_COMMENT = '/:id/comment';
 const DELETE_COMMENT = '/:id/delete-comment';
+const EDIT_COMMENT = '/:id/edit-comment';
 const LIKE = '/:id/like';
 const DISLIKE = '/:id/dislike';
 const BOOKMARK = '/:id/bookmark';
 const SUBSCRIPTION_FROM_PROFILE = '/:id/subscription-from-profile';
 const SUBSCRIPTION_FROM_VIDEO = '/:id/subscription-from-video';
+const GET_USER = '/:id/get-user';
 
 const routes = {
     home: HOME,
@@ -99,11 +101,13 @@ const routes = {
     registerView: REGISTER_VIEW,
     addComment: ADD_COMMENT,
     deleteComment: DELETE_COMMENT,
+    editComment: EDIT_COMMENT,
     like: LIKE,
     dislike: DISLIKE,
     bookmark: BOOKMARK,
     subscriptionFromProfile: SUBSCRIPTION_FROM_PROFILE,
     subscriptionFromVideo: SUBSCRIPTION_FROM_VIDEO,
+    getUser: GET_USER,
 };
 
 export default routes;

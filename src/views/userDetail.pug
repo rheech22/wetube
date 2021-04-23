@@ -4,7 +4,10 @@ include mixins/videoBlock
 block content
     .user-profile
         .user-profile__header
-            img.u-avatar(src=user.avatarUrl)
+            if user.avatarUrl
+                img.u-avatar(src=user.avatarUrl)
+            else
+                img.u-avatar(src="https://mblogthumb-phinf.pstatic.net/20150403_86/e2voo_14280514283502gas9_JPEG/kakako-00.jpg?type=w800")
             h4.profile__username=user.name
             if user.subscribers.length !== 0
                 if user.subscribers.length === 1
@@ -18,7 +21,7 @@ block content
                     else
                         button#jsSubscriptionBtn(style="color: white") SUBSCRIBE
             else
-                button#jsCantSubscriptionBtn SUBSCRIBE
+                button#jsSubscriptionBtn(style="color: white") SUBSCRIBE
         if loggedUser
              if user.id === loggedUser.id
                 .user-profile__btns

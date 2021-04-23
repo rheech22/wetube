@@ -67,6 +67,7 @@
         margin-bottom: 15px;
         padding: 20px 10px;
         border-radius: 3px;
+        color: $dark-grey;
 
         input {
             padding: 10px 0px;
@@ -76,7 +77,6 @@
 
         label {
             opacity: 0.6;
-            color: $dark-grey;
         }
     }
 }

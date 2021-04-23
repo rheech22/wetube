@@ -58,8 +58,11 @@ export const videoDetail = async (req, res) => {
     try {
         const video = await Video.findById(id)
             .populate('creator')
-            .populate('comments');
-
+            .populate({
+                path: 'comments',
+                populate: { path: 'creator', select: 'name avatarUrl' },
+            });
+        // console.log(video);
         //other videos
         const videos = await Video.find({}).sort({ _id: -1 });
         const otherVideos = videos.filter(
@@ -73,7 +76,7 @@ export const videoDetail = async (req, res) => {
         };
         shuffle(otherVideos);
 
-        //date
+        //date_video
         const videoDate = video.createdAt;
         const getFormattedDate = (date) => {
             const year = date.getFullYear();
@@ -83,29 +86,6 @@ export const videoDetail = async (req, res) => {
         };
         const uploadDate = getFormattedDate(videoDate);
 
-        // //how long
-        // const timeNow = Date.now();
-        // const timeUpload = videoDate.getTime();
-        // const timeDiff = timeNow - timeUpload;
-        // const dayDiff = timeDiff / 1000 / 60 / 60 / 24;
-        // let finalDiff;
-        // // console.log(Math.floor(dayDiff));
-        // if (dayDiff >= 730) {
-        //     finalDiff = `${Math.floor(dayDiff / 365)} years ago`;
-        // } else if (dayDiff >= 365) {
-        //     finalDiff = `a year ago`;
-        // } else if (dayDiff >= 60) {
-        //     finalDiff = `${Math.floor(dayDiff / 30)} months ago`;
-        // } else if (dayDiff >= 30) {
-        //     finalDiff = `a month ago`;
-        // } else if (dayDiff < 1) {
-        //     finalDiff = `${Math.floor(dayDiff * 24)} hours ago`;
-        // } else if (dayDiff < 2) {
-        //     finalDiff = `a day ago`;
-        // } else {
-        //     finalDiff = `${Math.floor(dayDiff)} days ago`;
-        // }
-        // console.log(finalDiff);
         res.render('videoDetail', {
             pageTitle: video.title,
             video,
@@ -199,6 +179,7 @@ export const postAddComment = async (req, res) => {
         params: { id },
         body: { comment },
         user,
+        createdAt = Date.now(),
     } = req;
     try {
         const video = await Video.findById(id);
@@ -206,14 +187,16 @@ export const postAddComment = async (req, res) => {
             text: comment,
             creator: user.id,
             videos: id,
+            createdAt,
             // creator: req.user.id,
         });
-        console.log(user.id);
-        console.log(id);
-        console.log(newComment.id);
+        // console.log(user.id);
+        // console.log(id);
+        // console.log(newComment.id);
         video.comments.push(newComment.id);
         video.save();
     } catch (error) {
+        // req.flash('error', 'You need to be logged in.');
         res.status(400);
     } finally {
         res.end();
@@ -236,6 +219,27 @@ export const deleteComment = async (req, res) => {
         video.comments.reverse();
         video.save();
         // await Comment.findOneAndRemove({ _id: deleteCommentId });
+    } catch (error) {
+        console.log('error');
+        res.status(400);
+    } finally {
+        res.end();
+    }
+};
+
+export const postEditComment = async (req, res) => {
+    const {
+        params: { id },
+        body: { index, comment },
+    } = req;
+    try {
+        const video = await Video.findById(id);
+        const commentList = video.comments.reverse();
+        const commentID = commentList.splice(index, 1);
+        console.log(commentID);
+        await Comment.findByIdAndUpdate(commentID, {
+            text: comment,
+        });
     } catch (error) {
         console.log('error');
         res.status(400);
@@ -279,6 +283,7 @@ export const likeVideo = async (req, res) => {
         }
         video.save();
     } catch (error) {
+        // req.flash('error', 'You need to be logged in.');
         res.status(400);
     } finally {
         res.end();
@@ -316,6 +321,7 @@ export const dislikeVideo = async (req, res) => {
         }
         video.save();
     } catch (error) {
+        // req.flash('error', 'You need to be logged in.');
         res.status(400);
     } finally {
         res.end();
@@ -357,6 +363,18 @@ export const addBookmark = async (req, res) => {
         bookmarkUser.save();
         console.log(video.bookmarkUsers);
         console.log(bookmarkUser.bookmarkVideos);
+    } catch (error) {
+        // req.flash('error', 'You need to be logged in.');
+        res.status(400);
+    } finally {
+        res.end();
+    }
+};
+
+export const getUserInfo = async (req, res) => {
+    const { user } = req;
+    try {
+        console.log(user);
     } catch (error) {
         res.status(400);
     } finally {

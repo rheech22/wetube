@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addBookmark = exports.dislikeVideo = exports.likeVideo = exports.deleteComment = exports.postAddComment = exports.postRegisterView = exports.deleteVideo = exports.postEditVideo = exports.getEditVideo = exports.videoDetail = exports.postUpload = exports.getUpload = exports.search = exports.home = void 0;
+exports.getUserInfo = exports.addBookmark = exports.dislikeVideo = exports.likeVideo = exports.postEditComment = exports.deleteComment = exports.postAddComment = exports.postRegisterView = exports.deleteVideo = exports.postEditVideo = exports.getEditVideo = exports.videoDetail = exports.postUpload = exports.getUpload = exports.search = exports.home = void 0;
 
 var _routes = _interopRequireDefault(require("../routes"));
 
@@ -173,7 +173,13 @@ var videoDetail = /*#__PURE__*/function () {
             id = req.params.id;
             _context4.prev = 1;
             _context4.next = 4;
-            return _Videos["default"].findById(id).populate('creator').populate('comments');
+            return _Videos["default"].findById(id).populate('creator').populate({
+              path: 'comments',
+              populate: {
+                path: 'creator',
+                select: 'name avatarUrl'
+              }
+            });
 
           case 4:
             video = _context4.sent;
@@ -197,7 +203,7 @@ var videoDetail = /*#__PURE__*/function () {
               }
             };
 
-            shuffle(otherVideos); //date
+            shuffle(otherVideos); //date_video
 
             videoDate = video.createdAt;
 
@@ -208,30 +214,7 @@ var videoDetail = /*#__PURE__*/function () {
               return "".concat(year, ".").concat(month, ".").concat(day);
             };
 
-            uploadDate = getFormattedDate(videoDate); // //how long
-            // const timeNow = Date.now();
-            // const timeUpload = videoDate.getTime();
-            // const timeDiff = timeNow - timeUpload;
-            // const dayDiff = timeDiff / 1000 / 60 / 60 / 24;
-            // let finalDiff;
-            // // console.log(Math.floor(dayDiff));
-            // if (dayDiff >= 730) {
-            //     finalDiff = `${Math.floor(dayDiff / 365)} years ago`;
-            // } else if (dayDiff >= 365) {
-            //     finalDiff = `a year ago`;
-            // } else if (dayDiff >= 60) {
-            //     finalDiff = `${Math.floor(dayDiff / 30)} months ago`;
-            // } else if (dayDiff >= 30) {
-            //     finalDiff = `a month ago`;
-            // } else if (dayDiff < 1) {
-            //     finalDiff = `${Math.floor(dayDiff * 24)} hours ago`;
-            // } else if (dayDiff < 2) {
-            //     finalDiff = `a day ago`;
-            // } else {
-            //     finalDiff = `${Math.floor(dayDiff)} days ago`;
-            // }
-            // console.log(finalDiff);
-
+            uploadDate = getFormattedDate(videoDate);
             res.render('videoDetail', {
               pageTitle: video.title,
               video: video,
@@ -477,12 +460,13 @@ exports.postRegisterView = postRegisterView;
 
 var postAddComment = /*#__PURE__*/function () {
   var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(req, res) {
-    var id, comment, user, video, newComment;
+    var id, comment, user, _req$createdAt2, createdAt, video, newComment;
+
     return regeneratorRuntime.wrap(function _callee9$(_context9) {
       while (1) {
         switch (_context9.prev = _context9.next) {
           case 0:
-            id = req.params.id, comment = req.body.comment, user = req.user;
+            id = req.params.id, comment = req.body.comment, user = req.user, _req$createdAt2 = req.createdAt, createdAt = _req$createdAt2 === void 0 ? Date.now() : _req$createdAt2;
             _context9.prev = 1;
             _context9.next = 4;
             return _Videos["default"].findById(id);
@@ -493,36 +477,38 @@ var postAddComment = /*#__PURE__*/function () {
             return _Comment["default"].create({
               text: comment,
               creator: user.id,
-              videos: id // creator: req.user.id,
+              videos: id,
+              createdAt: createdAt // creator: req.user.id,
 
             });
 
           case 7:
             newComment = _context9.sent;
-            console.log(user.id);
-            console.log(id);
-            console.log(newComment.id);
+            // console.log(user.id);
+            // console.log(id);
+            // console.log(newComment.id);
             video.comments.push(newComment.id);
             video.save();
-            _context9.next = 18;
+            _context9.next = 15;
             break;
+
+          case 12:
+            _context9.prev = 12;
+            _context9.t0 = _context9["catch"](1);
+            // req.flash('error', 'You need to be logged in.');
+            res.status(400);
 
           case 15:
             _context9.prev = 15;
-            _context9.t0 = _context9["catch"](1);
-            res.status(400);
+            res.end();
+            return _context9.finish(15);
 
           case 18:
-            _context9.prev = 18;
-            res.end();
-            return _context9.finish(18);
-
-          case 21:
           case "end":
             return _context9.stop();
         }
       }
-    }, _callee9, null, [[1, 15, 18, 21]]);
+    }, _callee9, null, [[1, 12, 15, 18]]);
   }));
 
   return function postAddComment(_x17, _x18) {
@@ -580,27 +566,80 @@ var deleteComment = /*#__PURE__*/function () {
   return function deleteComment(_x19, _x20) {
     return _ref11.apply(this, arguments);
   };
-}(); //like and dislike
-//해당 array에 null 값이 들어가서 bad request 400 이 나오는 오류 수정
-//db에서 직접 null값을 제거해주니 정상작동.. 어떻게 null 값이 들어갔는지는 모르겠음
-
+}();
 
 exports.deleteComment = deleteComment;
 
-var likeVideo = /*#__PURE__*/function () {
+var postEditComment = /*#__PURE__*/function () {
   var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(req, res) {
-    var id, user, video, filteredLikes, filteredDislikes;
+    var id, _req$body3, index, comment, video, commentList, commentID;
+
     return regeneratorRuntime.wrap(function _callee11$(_context11) {
       while (1) {
         switch (_context11.prev = _context11.next) {
           case 0:
-            id = req.params.id, user = req.user;
+            id = req.params.id, _req$body3 = req.body, index = _req$body3.index, comment = _req$body3.comment;
             _context11.prev = 1;
             _context11.next = 4;
             return _Videos["default"].findById(id);
 
           case 4:
             video = _context11.sent;
+            commentList = video.comments.reverse();
+            commentID = commentList.splice(index, 1);
+            console.log(commentID);
+            _context11.next = 10;
+            return _Comment["default"].findByIdAndUpdate(commentID, {
+              text: comment
+            });
+
+          case 10:
+            _context11.next = 16;
+            break;
+
+          case 12:
+            _context11.prev = 12;
+            _context11.t0 = _context11["catch"](1);
+            console.log('error');
+            res.status(400);
+
+          case 16:
+            _context11.prev = 16;
+            res.end();
+            return _context11.finish(16);
+
+          case 19:
+          case "end":
+            return _context11.stop();
+        }
+      }
+    }, _callee11, null, [[1, 12, 16, 19]]);
+  }));
+
+  return function postEditComment(_x21, _x22) {
+    return _ref12.apply(this, arguments);
+  };
+}(); //like and dislike
+//해당 array에 null 값이 들어가서 bad request 400 이 나오는 오류 수정
+//db에서 직접 null값을 제거해주니 정상작동.. 어떻게 null 값이 들어갔는지는 모르겠음
+
+
+exports.postEditComment = postEditComment;
+
+var likeVideo = /*#__PURE__*/function () {
+  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(req, res) {
+    var id, user, video, filteredLikes, filteredDislikes;
+    return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      while (1) {
+        switch (_context12.prev = _context12.next) {
+          case 0:
+            id = req.params.id, user = req.user;
+            _context12.prev = 1;
+            _context12.next = 4;
+            return _Videos["default"].findById(id);
+
+          case 4:
+            video = _context12.sent;
 
             if (video.likes.includes(user.id)) {
               filteredLikes = video.likes.filter(function (element) {
@@ -624,48 +663,49 @@ var likeVideo = /*#__PURE__*/function () {
             }
 
             video.save();
-            _context11.next = 12;
+            _context12.next = 12;
             break;
 
           case 9:
-            _context11.prev = 9;
-            _context11.t0 = _context11["catch"](1);
+            _context12.prev = 9;
+            _context12.t0 = _context12["catch"](1);
+            // req.flash('error', 'You need to be logged in.');
             res.status(400);
 
           case 12:
-            _context11.prev = 12;
+            _context12.prev = 12;
             res.end();
-            return _context11.finish(12);
+            return _context12.finish(12);
 
           case 15:
           case "end":
-            return _context11.stop();
+            return _context12.stop();
         }
       }
-    }, _callee11, null, [[1, 9, 12, 15]]);
+    }, _callee12, null, [[1, 9, 12, 15]]);
   }));
 
-  return function likeVideo(_x21, _x22) {
-    return _ref12.apply(this, arguments);
+  return function likeVideo(_x23, _x24) {
+    return _ref13.apply(this, arguments);
   };
 }();
 
 exports.likeVideo = likeVideo;
 
 var dislikeVideo = /*#__PURE__*/function () {
-  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(req, res) {
+  var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(req, res) {
     var id, user, video, filteredDislikes, filteredLikes;
-    return regeneratorRuntime.wrap(function _callee12$(_context12) {
+    return regeneratorRuntime.wrap(function _callee13$(_context13) {
       while (1) {
-        switch (_context12.prev = _context12.next) {
+        switch (_context13.prev = _context13.next) {
           case 0:
             id = req.params.id, user = req.user;
-            _context12.prev = 1;
-            _context12.next = 4;
+            _context13.prev = 1;
+            _context13.next = 4;
             return _Videos["default"].findById(id);
 
           case 4:
-            video = _context12.sent;
+            video = _context13.sent;
 
             if (video.dislikes.includes(user.id)) {
               filteredDislikes = video.dislikes.filter(function (element) {
@@ -689,29 +729,30 @@ var dislikeVideo = /*#__PURE__*/function () {
             }
 
             video.save();
-            _context12.next = 12;
+            _context13.next = 12;
             break;
 
           case 9:
-            _context12.prev = 9;
-            _context12.t0 = _context12["catch"](1);
+            _context13.prev = 9;
+            _context13.t0 = _context13["catch"](1);
+            // req.flash('error', 'You need to be logged in.');
             res.status(400);
 
           case 12:
-            _context12.prev = 12;
+            _context13.prev = 12;
             res.end();
-            return _context12.finish(12);
+            return _context13.finish(12);
 
           case 15:
           case "end":
-            return _context12.stop();
+            return _context13.stop();
         }
       }
-    }, _callee12, null, [[1, 9, 12, 15]]);
+    }, _callee13, null, [[1, 9, 12, 15]]);
   }));
 
-  return function dislikeVideo(_x23, _x24) {
-    return _ref13.apply(this, arguments);
+  return function dislikeVideo(_x25, _x26) {
+    return _ref14.apply(this, arguments);
   };
 }(); //Bookmark
 
@@ -719,24 +760,24 @@ var dislikeVideo = /*#__PURE__*/function () {
 exports.dislikeVideo = dislikeVideo;
 
 var addBookmark = /*#__PURE__*/function () {
-  var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13(req, res) {
+  var _ref15 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14(req, res) {
     var id, user, video, bookmarkUser, filteredBookmarkUsers, filteredBookmarkVideos;
-    return regeneratorRuntime.wrap(function _callee13$(_context13) {
+    return regeneratorRuntime.wrap(function _callee14$(_context14) {
       while (1) {
-        switch (_context13.prev = _context13.next) {
+        switch (_context14.prev = _context14.next) {
           case 0:
             id = req.params.id, user = req.user;
-            _context13.prev = 1;
-            _context13.next = 4;
+            _context14.prev = 1;
+            _context14.next = 4;
             return _Videos["default"].findById(id);
 
           case 4:
-            video = _context13.sent;
-            _context13.next = 7;
+            video = _context14.sent;
+            _context14.next = 7;
             return _User["default"].findById(user.id);
 
           case 7:
-            bookmarkUser = _context13.sent;
+            bookmarkUser = _context14.sent;
             console.log(video.bookmarkUsers);
             console.log(bookmarkUser.bookmarkVideos);
 
@@ -762,30 +803,63 @@ var addBookmark = /*#__PURE__*/function () {
             bookmarkUser.save();
             console.log(video.bookmarkUsers);
             console.log(bookmarkUser.bookmarkVideos);
-            _context13.next = 20;
+            _context14.next = 20;
             break;
 
           case 17:
-            _context13.prev = 17;
-            _context13.t0 = _context13["catch"](1);
+            _context14.prev = 17;
+            _context14.t0 = _context14["catch"](1);
+            // req.flash('error', 'You need to be logged in.');
             res.status(400);
 
           case 20:
-            _context13.prev = 20;
+            _context14.prev = 20;
             res.end();
-            return _context13.finish(20);
+            return _context14.finish(20);
 
           case 23:
           case "end":
-            return _context13.stop();
+            return _context14.stop();
         }
       }
-    }, _callee13, null, [[1, 17, 20, 23]]);
+    }, _callee14, null, [[1, 17, 20, 23]]);
   }));
 
-  return function addBookmark(_x25, _x26) {
-    return _ref14.apply(this, arguments);
+  return function addBookmark(_x27, _x28) {
+    return _ref15.apply(this, arguments);
   };
 }();
 
 exports.addBookmark = addBookmark;
+
+var getUserInfo = /*#__PURE__*/function () {
+  var _ref16 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(req, res) {
+    var user;
+    return regeneratorRuntime.wrap(function _callee15$(_context15) {
+      while (1) {
+        switch (_context15.prev = _context15.next) {
+          case 0:
+            user = req.user;
+
+            try {
+              console.log(user);
+            } catch (error) {
+              res.status(400);
+            } finally {
+              res.end();
+            }
+
+          case 2:
+          case "end":
+            return _context15.stop();
+        }
+      }
+    }, _callee15);
+  }));
+
+  return function getUserInfo(_x29, _x30) {
+    return _ref16.apply(this, arguments);
+  };
+}();
+
+exports.getUserInfo = getUserInfo;

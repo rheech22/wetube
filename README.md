@@ -34,8 +34,9 @@ Cloning Youtube with Vanilla and NodeJS
         -   [ ] Mobile-web \_ 4
 -   [x] x-days ago, x-hours go, 방금 전
 -   [x] subscribe/subscriber
--   [ ] comment revison \_ 3
--   [ ] A comment in Comments \_ 3
+-   [x] comment revison \_ 3
+-   [ ] comment info \_ 3
+-   [ ] A comment in Comments \_ 4
 -   [x] play-progress bar (If getting total time works well on Heroku) \_ 1
--   [ ] Heroku \_ 2
+-   [x] Heroku \_ 2
 -   [ ] safari mode \_ 6
